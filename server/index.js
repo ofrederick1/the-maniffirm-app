@@ -1,18 +1,33 @@
-require('dotenv').config();
-const express = require('express');
-const sequelize = require('./config/db');
-const PORT = process.env.PORT || 5000;
+require("dotenv").config();
+const express = require("express");
+const sequelize = require("./config/db");
+const User = require("./models/user.model"); // Ensure model is registered
 
 const app = express();
+const PORT = process.env.PORT || 3500;
+
+// Sync the database
+sequelize.sync();
+//! to reset database when you make changes to models
+// sequelize.sync({ force: true }).then(() => {
+//   console.log("Database synced with force: true");
+// });
+
+//Controllers
+const userController = require("./controller/user.controller");
+
+// Middleware
 app.use(express.json());
+app.use("/user", userController);
 
-sequelize.authenticate()
-  .then(() => console.log('✅ Connected to PostgreSQL via Sequelize'))
-  .catch((err) => console.error('❌ Database connection failed:', err));
+// Routes
+app.get("/", (req, res) => {
+  console.log("Maniffirm Backend is Running ✅");
+  res.send("Maniffirm Backend is Running ✅");
+});
+app.use("/user", userController);
 
-// Route
-app.get('/', (req, res) => res.send('Maniffirm Backend is Running'));
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+// Start Server
+app.listen(PORT, function () {
+  console.log(`Server is listening on http://localhost:${PORT}`);
 });
